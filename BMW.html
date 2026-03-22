@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q::nect — 질문으로 설계하는 미래</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #111827;
+    --card: #161d2e;
+    --border: rgba(99,179,237,0.15);
+    --accent: #63b3ed;
+    --accent2: #f6ad55;
+    --accent3: #68d391;
+    --text: #e2e8f0;
+    --muted: #718096;
+    --danger: #fc8181;
+    --riasec-r: #f6ad55;
+    --riasec-i: #63b3ed;
+    --riasec-a: #b794f4;
+    --riasec-s: #68d391;
+    --riasec-e: #fc8181;
+    --riasec-c: #fbd38d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(99,179,237,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,179,237,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; position: relative; z-index: 1; }
+  .screen.active { display: block; }
+
+  /* ── LANDING ── */
+  #screen-landing {
+    min-height: 100vh;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+  #screen-landing.active { display: flex; }
+
+  .logo-mark {
+    font-family: 'Space Mono', monospace;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -2px;
+    margin-bottom: 0.25rem;
+    position: relative;
+    display: inline-block;
+  }
+  .logo-mark span { color: var(--accent2); }
+  .logo-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+
+  .tagline {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    max-width: 520px;
+    margin-bottom: 0.75rem;
+  }
+  .tagline em { color: var(--accent); font-style: italic; }
+
+  .sub-tagline {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 420px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0e1a;
+    border: none;
+    padding: 0.85rem 2.2rem;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary:hover { background: #90cdf4; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    padding: 0.7rem 1.8rem;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 0.75rem;
+  }
+  .btn-ghost:hover { border-color: var(--accent); background: rgba(99,179,237,0.08); }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 700px;
+    margin-top: 3rem;
+  }
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem;
+    text-align: left;
+  }
+  .feature-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .feature-label { font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 0.25rem; letter-spacing: 0.5px; }
+  .feature-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+  /* ── ONBOARDING ── */
+  #screen-onboarding {
+    min-height: 100vh;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  #screen-onboarding.active { display: flex; }
+
+  .onboard-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2.5rem;
+    max-width: 520px;
+    width: 100%;
+  }
+  .onboard-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+  .onboard-sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 2rem; line-height: 1.6; }
+  .field-label { font-size: 0.8rem; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+  .field-input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    border-radius: 3px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 1.25rem;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-select {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    border-radius: 3px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    margin-bottom: 1.25rem;
+    cursor: pointer;
+  }
+
+  /* ── MAIN APP ── */
+  #screen-app {
+    min-height: 100vh;
+    display: none;
+    flex-direction: column;
+  }
+  #screen-app.active { display: flex; }
+
+  /* Header */
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,14,26,0.9);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-logo {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent);
+  }
+  .header-logo span { color: var(--accent2); }
+
+  .nav-tabs {
+    display: flex;
+    gap: 0.25rem;
+  }
+  .nav-tab {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.85rem;
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+  .nav-tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .nav-tab.active { color: var(--accent); background: rgba(99,179,237,0.1); }
+
+  .user-badge {
+    font-size: 0.8rem;
+    color: var(--muted);
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+  }
+  .user-badge strong { color: var(--text); }
+
+  /* Tab content */
+  .tab-content { display: none; flex: 1; }
+  .tab-content.active { display: flex; }
+
+  /* ─ CHAT TAB ─ */
+  .chat-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    height: calc(100vh - 57px);
+    width: 100%;
+  }
+
+  .chat-sidebar {
+    border-right: 1px solid var(--border);
+    padding: 1.25rem;
+    overflow-y: auto;
+    background: var(--bg2);
+  }
+
+  .sidebar-section-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  /* RIASEC bars */
+  .riasec-bar-wrap { margin-bottom: 0.6rem; }
+  .riasec-label-row { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.3rem; }
+  .riasec-name { color: var(--text); font-weight: 500; }
+  .riasec-score { color: var(--muted); font-family: 'Space Mono', monospace; font-size: 0.75rem; }
+  .riasec-bar-bg { background: rgba(255,255,255,0.06); border-radius: 2px; height: 5px; }
+  .riasec-bar-fill { height: 5px; border-radius: 2px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+
+  .riasec-summary {
+    background: rgba(99,179,237,0.06);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .riasec-summary strong { color: var(--accent2); }
+
+  .portfolio-list { list-style: none; }
+  .portfolio-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .portfolio-item:hover { border-color: var(--accent); }
+  .portfolio-item-date { color: var(--muted); font-size: 0.72rem; margin-top: 0.25rem; font-family: 'Space Mono', monospace; }
+
+  /* Chat main */
+  .chat-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .msg {
+    max-width: 75%;
+    animation: msgIn 0.3s ease;
+  }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .msg-ai { align-self: flex-start; }
+  .msg-user { align-self: flex-end; }
+
+  .msg-bubble {
+    padding: 0.9rem 1.1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .msg-ai .msg-bubble {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+  }
+  .msg-user .msg-bubble {
+    background: rgba(99,179,237,0.12);
+    border: 1px solid rgba(99,179,237,0.25);
+    text-align: right;
+  }
+
+  .msg-meta {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    font-family: 'Space Mono', monospace;
+  }
+  .msg-user .msg-meta { text-align: right; }
+
+  .msg-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+  .msg-tag {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .prompt-feedback {
+    background: rgba(246,173,85,0.08);
+    border: 1px solid rgba(246,173,85,0.25);
+    border-radius: 3px;
+    padding: 0.6rem 0.9rem;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--accent2);
+  }
+  .prompt-feedback-label { font-weight: 700; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 0.25rem; }
+
+  .typing-indicator {
+    display: none;
+    align-self: flex-start;
+    padding: 0.9rem 1.1rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+  }
+  .typing-indicator.visible { display: flex; gap: 4px; align-items: center; }
+  .typing-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: typingDot 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingDot {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-4px); }
+  }
+
+  /* Quick suggestions */
+  .suggestions {
+    padding: 0 1.5rem 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .suggestion-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .suggestion-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Input area */
+  .chat-input-wrap {
+    border-top: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    background: var(--bg2);
+  }
+  .prompt-quality {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    align-items: center;
+  }
+  .quality-bar-wrap { flex: 1; background: rgba(255,255,255,0.06); border-radius: 2px; height: 4px; }
+  .quality-bar { height: 4px; border-radius: 2px; background: var(--accent3); transition: width 0.4s; }
+
+  .input-row { display: flex; gap: 0.75rem; }
+  .chat-textarea {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    border-radius: 3px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.9rem;
+    resize: none;
+    outline: none;
+    min-height: 44px;
+    max-height: 120px;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+  .chat-textarea:focus { border-color: var(--accent); }
+  .send-btn {
+    background: var(--accent);
+    color: #0a0e1a;
+    border: none;
+    padding: 0 1.25rem;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .send-btn:hover { background: #90cdf4; }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ─ ROADMAP TAB ─ */
+  .roadmap-layout {
+    width: 100%;
+    padding: 2rem;
+    overflow-y: auto;
+  }
+
+  .roadmap-header {
+    margin-bottom: 2rem;
+  }
+  .roadmap-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .roadmap-sub { color: var(--muted); font-size: 0.875rem; }
+
+  .roadmap-riasec {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .riasec-pill {
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    border: 1px solid;
+  }
+
+  .career-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .career-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .career-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .career-card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+  .career-card-name { font-weight: 700; margin-bottom: 0.25rem; }
+  .career-card-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.6; margin-bottom: 0.75rem; }
+  .career-card-match {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+  }
+  .match-bar-bg { flex: 1; background: rgba(255,255,255,0.06); border-radius: 2px; height: 4px; }
+  .match-bar-fill { height: 4px; border-radius: 2px; background: var(--accent3); }
+  .match-pct { font-family: 'Space Mono', monospace; color: var(--accent3); font-size: 0.78rem; }
+
+  .timeline-section { margin-top: 2rem; }
+  .timeline-title { font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem; }
+  .timeline {
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 1.25rem;
+    padding-left: 1.25rem;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.4rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+  .timeline-phase { font-size: 0.72rem; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.25rem; font-family: 'Space Mono', monospace; }
+  .timeline-item-title { font-weight: 700; margin-bottom: 0.25rem; }
+  .timeline-item-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.6; }
+
+  /* ─ PORTFOLIO TAB ─ */
+  .portfolio-layout {
+    width: 100%;
+    padding: 2rem;
+    overflow-y: auto;
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+  .portfolio-entry {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem;
+  }
+  .portfolio-entry-type {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 0.5rem;
+  }
+  .portfolio-entry-title { font-weight: 700; margin-bottom: 0.5rem; }
+  .portfolio-entry-body { color: var(--muted); font-size: 0.82rem; line-height: 1.6; margin-bottom: 0.75rem; }
+  .portfolio-entry-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .portfolio-tag {
+    background: rgba(99,179,237,0.1);
+    border: 1px solid rgba(99,179,237,0.2);
+    color: var(--accent);
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    font-size: 0.7rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+  }
+  .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+  .empty-state-text { font-size: 0.9rem; line-height: 1.6; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(99,179,237,0.2); border-radius: 2px; }
+
+  @media (max-width: 768px) {
+    .chat-layout { grid-template-columns: 1fr; }
+    .chat-sidebar { display: none; }
+    .feature-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LANDING ══════════════ -->
+<div id="screen-landing" class="screen active">
+  <div class="logo-mark">Q<span>::</span>nect</div>
+  <div class="logo-sub">Question + Connect</div>
+  <div class="tagline">질문으로<br><em>설계하는</em> 미래</div>
+  <div class="sub-tagline">재외국민 학생을 위한 AI 기반 진로 탐색 플랫폼.<br>질문을 통해 자신을 발견하고, 미래를 설계하세요.</div>
+  <div>
+    <button class="btn-primary" onclick="goTo('onboarding')">시작하기 →</button>
+    <button class="btn-ghost" onclick="demoSkip()">데모 보기</button>
+  </div>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-label">AI 진로 멘토</div>
+      <div class="feature-desc">대화형 AI가 질문을 통해 당신의 강점과 관심사를 발견합니다</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧭</div>
+      <div class="feature-label">RIASEC 분석</div>
+      <div class="feature-desc">홀랜드 직업흥미 검사 기반의 실시간 성향 분석과 맞춤형 로드맵</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📁</div>
+      <div class="feature-label">포트폴리오</div>
+      <div class="feature-desc">탐색 과정이 자동으로 축적되어 개인 포트폴리오로 성장합니다</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ONBOARDING ══════════════ -->
+<div id="screen-onboarding" class="screen">
+  <div class="onboard-card">
+    <div class="onboard-title">처음 뵙겠습니다 👋</div>
+    <div class="onboard-sub">몇 가지 정보를 알려주시면 당신에게 맞춤화된 진로 탐색을 시작할 수 있어요.</div>
+
+    <label class="field-label">이름 (닉네임도 좋아요)</label>
+    <input class="field-input" id="inp-name" type="text" placeholder="예: 김민준" />
+
+    <label class="field-label">거주 국가</label>
+    <select class="field-select" id="inp-country">
+      <option value="">선택해주세요</option>
+      <option value="japan">🇯🇵 일본</option>
+      <option value="china">🇨🇳 중국</option>
+      <option value="vietnam">🇻🇳 베트남</option>
+      <option value="indonesia">🇮🇩 인도네시아</option>
+      <option value="thailand">🇹🇭 태국</option>
+      <option value="malaysia">🇲🇾 말레이시아</option>
+      <option value="usa">🇺🇸 미국</option>
+      <option value="other">🌏 기타</option>
+    </select>
+
+    <label class="field-label">학년</label>
+    <select class="field-select" id="inp-grade">
+      <option value="">선택해주세요</option>
+      <option value="middle1">중학교 1학년</option>
+      <option value="middle2">중학교 2학년</option>
+      <option value="middle3">중학교 3학년</option>
+      <option value="high1">고등학교 1학년</option>
+      <option value="high2">고등학교 2학년</option>
+      <option value="high3">고등학교 3학년</option>
+    </select>
+
+    <label class="field-label">관심 있는 분야 (선택)</label>
+    <input class="field-input" id="inp-interest" type="text" placeholder="예: 음악, 과학, 그림, 컴퓨터..." />
+
+    <button class="btn-primary" style="width:100%" onclick="startApp()">진로 탐색 시작하기 →</button>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN APP ══════════════ -->
+<div id="screen-app" class="screen">
+  <header class="app-header">
+    <div class="header-logo">Q<span>::</span>nect</div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('chat')">💬 AI 멘토</button>
+      <button class="nav-tab" onclick="switchTab('roadmap')">🧭 진로 로드맵</button>
+      <button class="nav-tab" onclick="switchTab('portfolio')">📁 포트폴리오</button>
+    </nav>
+    <div class="user-badge" id="user-badge">반갑습니다, <strong>학생</strong>님</div>
+  </header>
+
+  <!-- CHAT TAB -->
+  <div id="tab-chat" class="tab-content active">
+    <div class="chat-layout">
+      <!-- Sidebar -->
+      <aside class="chat-sidebar">
+        <div class="sidebar-section-title">RIASEC 성향 분석</div>
+        <div class="riasec-summary" id="riasec-summary">
+          대화를 나눌수록 당신의 성향이 분석됩니다. AI 멘토에게 솔직하게 이야기해 보세요!
+        </div>
+        <div id="riasec-bars">
+          <div class="riasec-bar-wrap">
+            <div class="riasec-label-row"><span class="riasec-name">R 현실형</span><span class="riasec-score" id="score-R">0%</span></div>
+            <div class="riasec-bar-bg"><div class="riasec-bar-fill" id="bar-R" style="width:0%;background:var(--riasec-r)"></div></div>
+          </div>
+          <div class="riasec-bar-wrap">
+            <div class="riasec-label-row"><span class="riasec-name">I 탐구형</span><span class="riasec-score" id="score-I">0%</span></div>
+            <div class="riasec-bar-bg"><div class="riasec-bar-fill" id="bar-I" style="width:0%;background:var(--riasec-i)"></div></div>
+          </div>
+          <div class="riasec-bar-wrap">
+            <div class="riasec-label-row"><span class="riasec-name">A 예술형</span><span class="riasec-score" id="score-A">0%</span></div>
+            <div class="riasec-bar-bg"><div class="riasec-bar-fill" id="bar-A" style="width:0%;background:var(--riasec-a)"></div></div>
+          </div>
+          <div class="riasec-bar-wrap">
+            <div class="riasec-label-row"><span class="riasec-name">S 사회형</span><span class="riasec-score" id="score-S">0%</span></div>
+            <div class="riasec-bar-bg"><div class="riasec-bar-fill" id="bar-S" style="width:0%;background:var(--riasec-s)"></div></div>
+          </div>
+          <div class="riasec-bar-wrap">
+            <div class="riasec-label-row"><span class="riasec-name">E 기업형</span><span class="riasec-score" id="score-E">0%</span></div>
+            <div class="riasec-bar-bg"><div class="riasec-bar-fill" id="bar-E" style="width:0%;background:var(--riasec-e)"></div></div>
+          </div>
+          <div class="riasec-bar-wrap">
+            <div class="riasec-label-row"><span class="riasec-name">C 관습형</span><span class="riasec-score" id="score-C">0%</span></div>
+            <div class="riasec-bar-bg"><div class="riasec-bar-fill" id="bar-C" style="width:0%;background:var(--riasec-c)"></div></div>
+          </div>
+        </div>
+
+        <div class="sidebar-section-title" style="margin-top:1.5rem">저장된 탐색 기록</div>
+        <ul class="portfolio-list" id="sidebar-portfolio">
+          <li style="color:var(--muted);font-size:0.8rem;padding:0.5rem 0">아직 기록이 없어요.<br>AI 멘토와 대화를 나눠보세요!</li>
+        </ul>
+      </aside>
+
+      <!-- Chat main -->
+      <main class="chat-main">
+        <div class="chat-messages" id="chat-messages">
+          <!-- Messages injected here -->
+        </div>
+        <div class="typing-indicator" id="typing">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+        <div class="suggestions" id="suggestions">
+          <button class="suggestion-btn" onclick="useSuggestion(this)">내가 좋아하는 것 탐색하기</button>
+          <button class="suggestion-btn" onclick="useSuggestion(this)">잘 하는 것 찾아보기</button>
+          <button class="suggestion-btn" onclick="useSuggestion(this)">해외에서 살며 느낀 점</button>
+          <button class="suggestion-btn" onclick="useSuggestion(this)">미래 직업이 궁금해요</button>
+        </div>
+        <div class="chat-input-wrap">
+          <div class="prompt-quality">
+            <span>프롬프트 품질</span>
+            <div class="quality-bar-wrap"><div class="quality-bar" id="quality-bar" style="width:0%"></div></div>
+            <span id="quality-label" style="font-family:'Space Mono',monospace;font-size:0.72rem">—</span>
+          </div>
+          <div class="input-row">
+            <textarea class="chat-textarea" id="chat-input" placeholder="궁금한 것, 좋아하는 것, 꿈꾸는 것 무엇이든 이야기해 보세요..." rows="1" oninput="onInputChange(this)" onkeydown="onKeyDown(event)"></textarea>
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">→</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ROADMAP TAB -->
+  <div id="tab-roadmap" class="tab-content">
+    <div class="roadmap-layout">
+      <div class="roadmap-header">
+        <div class="roadmap-title">나의 진로 로드맵</div>
+        <div class="roadmap-sub">RIASEC 분석 결과를 바탕으로 맞춤형 진로를 추천합니다. AI 멘토와 더 많이 대화할수록 정확해져요.</div>
+      </div>
+      <div class="roadmap-riasec" id="roadmap-pills"></div>
+      <div class="career-cards" id="career-cards">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-state-icon">🧭</div>
+          <div class="empty-state-text">AI 멘토와 대화를 나누면<br>맞춤형 진로 추천이 여기에 나타납니다.</div>
+        </div>
+      </div>
+      <div class="timeline-section" id="timeline-section" style="display:none">
+        <div class="timeline-title">📅 추천 로드맵</div>
+        <div class="timeline" id="roadmap-timeline"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO TAB -->
+  <div id="tab-portfolio" class="tab-content">
+    <div class="portfolio-layout">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem">
+        <div>
+          <div class="roadmap-title">나의 포트폴리오</div>
+          <div class="roadmap-sub">대화에서 저장된 나의 탐색 기록들</div>
+        </div>
+      </div>
+      <div class="portfolio-grid" id="portfolio-grid">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-state-icon">📁</div>
+          <div class="empty-state-text">아직 저장된 내용이 없습니다.<br>AI 멘토와 대화하며 나를 발견해 보세요!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const state = {
+  user: { name: '', country: '', grade: '', interest: '' },
+  messages: [],
+  riasec: { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 },
+  portfolio: [],
+  msgCount: 0,
+  isLoading: false,
+};
+
+const RIASEC_INFO = {
+  R: { label: '현실형', color: '#f6ad55', desc: '손으로 만들고 구체적인 것을 좋아함' },
+  I: { label: '탐구형', color: '#63b3ed', desc: '분석, 연구, 지식 탐구를 즐김' },
+  A: { label: '예술형', color: '#b794f4', desc: '창의적 표현과 자유로운 사고' },
+  S: { label: '사회형', color: '#68d391', desc: '사람 돕기, 가르치기, 소통하기' },
+  E: { label: '기업형', color: '#fc8181', desc: '리더십, 설득, 목표 달성' },
+  C: { label: '관습형', color: '#fbd38d', desc: '정확함, 체계, 데이터 정리' },
+};
+
+// Career database by RIASEC types
+const CAREERS = [
+  { name: '소프트웨어 엔지니어', icon: '💻', types: ['I','R','C'], desc: '알고리즘과 코드로 세상의 문제를 해결합니다.', match: 0 },
+  { name: 'UX/UI 디자이너', icon: '🎨', types: ['A','I','S'], desc: '사용자 경험을 연구하고 아름다운 인터페이스를 만듭니다.', match: 0 },
+  { name: '국제기구 활동가', icon: '🌏', types: ['S','E','A'], desc: '글로벌 이슈 해결을 위해 국제사회에서 활동합니다.', match: 0 },
+  { name: '과학자 / 연구원', icon: '🔬', types: ['I','R','C'], desc: '새로운 지식을 탐구하고 발견하는 일을 합니다.', match: 0 },
+  { name: '콘텐츠 크리에이터', icon: '📹', types: ['A','E','S'], desc: '창의적 콘텐츠로 사람들과 소통하고 영향력을 만듭니다.', match: 0 },
+  { name: '교육자 / 선생님', icon: '📚', types: ['S','A','I'], desc: '다음 세대를 이끌고 성장을 돕습니다.', match: 0 },
+  { name: '기업가 / 스타트업 창업자', icon: '🚀', types: ['E','R','I'], desc: '새로운 아이디어로 사업을 만들고 팀을 이끕니다.', match: 0 },
+  { name: '데이터 분석가', icon: '📊', types: ['I','C','R'], desc: '데이터를 분석하여 의미 있는 인사이트를 도출합니다.', match: 0 },
+  { name: '사회복지사', icon: '🤝', types: ['S','C','E'], desc: '어려운 환경의 사람들을 지원하고 돕습니다.', match: 0 },
+  { name: '음악가 / 작곡가', icon: '🎵', types: ['A','I','S'], desc: '음악을 통해 감정을 표현하고 사람들에게 감동을 줍니다.', match: 0 },
+];
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function goTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+}
+
+function demoSkip() {
+  state.user = { name: '데모 학생', country: 'japan', grade: 'high2', interest: '음악, 기술' };
+  initApp();
+}
+
+function startApp() {
+  const name = document.getElementById('inp-name').value.trim();
+  const country = document.getElementById('inp-country').value;
+  const grade = document.getElementById('inp-grade').value;
+  const interest = document.getElementById('inp-interest').value.trim();
+  if (!name || !country || !grade) { alert('이름, 거주 국가, 학년을 입력해 주세요!'); return; }
+  state.user = { name, country, grade, interest };
+  initApp();
+}
+
+function initApp() {
+  document.getElementById('user-badge').innerHTML = `반갑습니다, <strong>${state.user.name}</strong>님`;
+  goTo('app');
+  addWelcomeMessage();
+}
+
+// ═══════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'roadmap') updateRoadmap();
+  if (tab === 'portfolio') updatePortfolioTab();
+}
+
+// ═══════════════════════════════════════════
+// MESSAGES
+// ═══════════════════════════════════════════
+function addWelcomeMessage() {
+  const countryNames = { japan:'일본', china:'중국', vietnam:'베트남', indonesia:'인도네시아', thailand:'태국', malaysia:'말레이시아', usa:'미국', other:'해외' };
+  const country = countryNames[state.user.country] || '해외';
+  const gradeNames = { middle1:'중1', middle2:'중2', middle3:'중3', high1:'고1', high2:'고2', high3:'고3' };
+  const grade = gradeNames[state.user.grade] || '';
+
+  const welcomeText = `안녕하세요, **${state.user.name}**님! 👋
+
+저는 Q::nect의 AI 진로 멘토예요. ${country}에서 ${grade}을 다니고 계시는군요!
+
+저와의 대화를 통해 **당신이 좋아하는 것**, **잘 하는 것**, 그리고 **꿈꾸는 미래**를 함께 탐색해 볼게요.
+
+정답은 없어요. 솔직하게 이야기해 줄수록 더 정확한 진로를 찾을 수 있답니다. 😊
+
+**첫 번째 질문:** 요즘 가장 시간 가는 줄 모르고 할 수 있는 것이 있나요? 어떤 활동이든 좋아요!`;
+
+  appendMessage('ai', welcomeText, [], null);
+}
+
+function appendMessage(role, text, riasecTags, promptFeedback) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg msg-${role}`;
+
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+  let tagsHtml = '';
+  if (riasecTags && riasecTags.length) {
+    tagsHtml = '<div class="msg-tags">' + riasecTags.map(t => {
+      const info = RIASEC_INFO[t];
+      return `<span class="msg-tag" style="background:${info.color}22;color:${info.color};border:1px solid ${info.color}44">${info.label}</span>`;
+    }).join('') + '</div>';
+  }
+
+  let feedbackHtml = '';
+  if (promptFeedback) {
+    feedbackHtml = `<div class="prompt-feedback"><div class="prompt-feedback-label">💡 프롬프트 피드백</div>${promptFeedback}</div>`;
+  }
+
+  // Simple markdown-like bold
+  const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+
+  div.innerHTML = `
+    <div class="msg-bubble">${formatted}${tagsHtml}</div>
+    ${feedbackHtml}
+    <div class="msg-meta">${timeStr}</div>
+  `;
+
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+
+  // Store
+  state.messages.push({ role, text, riasecTags, time: timeStr });
+  state.msgCount++;
+}
+
+// ═══════════════════════════════════════════
+// INPUT HANDLING
+// ═══════════════════════════════════════════
+function onInputChange(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  assessPromptQuality(el.value);
+}
+
+function onKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function assessPromptQuality(text) {
+  if (!text.trim()) {
+    document.getElementById('quality-bar').style.width = '0%';
+    document.getElementById('quality-label').textContent = '—';
+    return;
+  }
+  let score = 0;
+  if (text.length > 10) score += 20;
+  if (text.length > 30) score += 20;
+  if (text.includes('왜') || text.includes('어떻게') || text.includes('무엇') || text.includes('?')) score += 20;
+  if (text.length > 60) score += 20;
+  if (text.includes('좋아') || text.includes('싫어') || text.includes('생각') || text.includes('느껴')) score += 20;
+
+  const labels = ['낮음', '보통', '좋음', '훌륭함', '완벽!'];
+  const colors = ['#fc8181', '#f6ad55', '#fbd38d', '#68d391', '#63b3ed'];
+  const idx = Math.min(Math.floor(score / 20), 4);
+
+  document.getElementById('quality-bar').style.width = score + '%';
+  document.getElementById('quality-bar').style.background = colors[idx];
+  document.getElementById('quality-label').textContent = labels[idx];
+  document.getElementById('quality-label').style.color = colors[idx];
+}
+
+function useSuggestion(btn) {
+  document.getElementById('chat-input').value = btn.textContent;
+  onInputChange(document.getElementById('chat-input'));
+  sendMessage();
+}
+
+// ═══════════════════════════════════════════
+// SEND & AI RESPONSE
+// ═══════════════════════════════════════════
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || state.isLoading) return;
+
+  // Assess prompt quality for feedback
+  const promptQuality = assessPromptQualityForFeedback(text);
+
+  appendMessage('user', text, [], null);
+  input.value = '';
+  input.style.height = 'auto';
+  assessPromptQuality('');
+
+  // Hide suggestions after first use
+  document.getElementById('suggestions').style.display = 'none';
+
+  state.isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('typing').classList.add('visible');
+  document.getElementById('chat-messages').scrollTop = 999999;
+
+  try {
+    const response = await callClaudeAPI(text);
+    document.getElementById('typing').classList.remove('visible');
+
+    // Parse response
+    const parsed = parseAIResponse(response);
+    appendMessage('ai', parsed.text, parsed.riasecTags, promptQuality.feedback);
+
+    // Update RIASEC scores
+    if (parsed.riasecTags.length) {
+      parsed.riasecTags.forEach(t => { state.riasec[t] = Math.min(100, state.riasec[t] + 15); });
+      updateRiasecBars();
+    }
+
+    // Auto-save to portfolio every 3 messages
+    if (state.msgCount % 6 === 0 && state.msgCount > 0) {
+      autoSavePortfolio(text, parsed.text, parsed.riasecTags);
+    }
+
+  } catch (e) {
+    document.getElementById('typing').classList.remove('visible');
+    appendMessage('ai', '죄송해요, 잠시 문제가 발생했어요. 다시 시도해 주세요! 🙏', [], null);
+  }
+
+  state.isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+async function callClaudeAPI(userText) {
+  const history = state.messages.slice(-8).map(m => ({
+    role: m.role === 'ai' ? 'assistant' : 'user',
+    content: m.text
+  }));
+
+  const countryNames = { japan:'일본', china:'중국', vietnam:'베트남', indonesia:'인도네시아', thailand:'태국', malaysia:'말레이시아', usa:'미국', other:'해외' };
+  const gradeNames = { middle1:'중학교 1학년', middle2:'중학교 2학년', middle3:'중학교 3학년', high1:'고등학교 1학년', high2:'고등학교 2학년', high3:'고등학교 3학년' };
+
+  const systemPrompt = `당신은 재외국민 학생들을 위한 따뜻하고 전문적인 AI 진로 멘토입니다.
+
+학생 정보:
+- 이름: ${state.user.name}
+- 거주 국가: ${countryNames[state.user.country] || '해외'}
+- 학년: ${gradeNames[state.user.grade] || ''}
+- 관심 분야: ${state.user.interest || '아직 탐색 중'}
+- 현재 RIASEC 점수: R=${state.riasec.R}, I=${state.riasec.I}, A=${state.riasec.A}, S=${state.riasec.S}, E=${state.riasec.E}, C=${state.riasec.C}
+
+역할:
+1. 학생의 이야기를 경청하고 공감하며 자연스럽게 대화를 이끌어 가세요.
+2. 학생이 자신의 강점, 관심사, 가치관을 스스로 발견하도록 질문해 주세요.
+3. 재외국민으로서의 경험(언어, 문화적 다양성)을 강점으로 인식하도록 도와주세요.
+4. 답변 마지막에는 반드시 한 가지 새로운 질문으로 대화를 이어가세요.
+5. 답변 형식: 자연스러운 대화체, 2-4 문단, 따뜻하고 격려하는 톤.
+
+RIASEC 분류 (응답 마지막에 JSON으로 추가):
+학생의 메시지에서 감지되는 RIASEC 유형을 RIASEC_TAGS:[R,I,A,S,E,C] 중 해당하는 것을 배열로 추가하세요.
+예: RIASEC_TAGS:["I","A"]
+
+반드시 한국어로 답변하세요.`;
+
+  const messages = [
+    ...history,
+    { role: 'user', content: userText }
+  ];
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages,
+    })
+  });
+
+  if (!res.ok) throw new Error('API Error');
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+function parseAIResponse(text) {
+  // Extract RIASEC tags
+  const tagMatch = text.match(/RIASEC_TAGS:\[([^\]]*)\]/);
+  let riasecTags = [];
+  let cleanText = text;
+
+  if (tagMatch) {
+    try {
+      riasecTags = JSON.parse(tagMatch[0].replace('RIASEC_TAGS:', ''));
+    } catch {}
+    cleanText = text.replace(/RIASEC_TAGS:\[[^\]]*\]/g, '').trim();
+  }
+
+  return { text: cleanText, riasecTags };
+}
+
+function assessPromptQualityForFeedback(text) {
+  let score = 0;
+  let tips = [];
+
+  if (text.length < 10) { tips.push('좀 더 자세히 이야기해 주면 좋겠어요!'); }
+  if (!text.includes('왜') && !text.includes('어떻게') && !text.includes('?') && text.length > 10) {
+    tips.push('"왜", "어떻게" 같은 질문어를 사용해보세요.');
+  }
+  if (text.length > 50) score += 1;
+  if (text.length > 100) score += 1;
+
+  if (score >= 2 && tips.length === 0) return { score, feedback: null };
+  if (tips.length === 0) return { score, feedback: null };
+  return { score, feedback: tips.join(' ') };
+}
+
+// ═══════════════════════════════════════════
+// RIASEC UI
+// ═══════════════════════════════════════════
+function updateRiasecBars() {
+  const types = ['R','I','A','S','E','C'];
+  const total = types.reduce((s,t) => s + state.riasec[t], 0) || 1;
+
+  types.forEach(t => {
+    const pct = Math.round((state.riasec[t] / total) * 100);
+    document.getElementById('bar-' + t).style.width = pct + '%';
+    document.getElementById('score-' + t).textContent = pct + '%';
+  });
+
+  // Find top types
+  const sorted = types.map(t => ({ t, v: state.riasec[t] })).sort((a,b) => b.v - a.v);
+  const top = sorted.filter(x => x.v > 0).slice(0, 2).map(x => RIASEC_INFO[x.t].label);
+
+  if (top.length) {
+    document.getElementById('riasec-summary').innerHTML =
+      `현재 <strong>${top.join(', ')}</strong> 성향이 두드러지고 있어요! 대화를 이어갈수록 더 정밀하게 분석됩니다.`;
+  }
+
+  // Update sidebar portfolio
+  updateSidebarPortfolio();
+}
+
+// ═══════════════════════════════════════════
+// ROADMAP
+// ═══════════════════════════════════════════
+function updateRoadmap() {
+  const types = ['R','I','A','S','E','C'];
+  const sorted = types.map(t => ({ t, v: state.riasec[t] })).sort((a,b) => b.v - a.v);
+  const topTypes = sorted.filter(x => x.v > 0).map(x => x.t);
+
+  // Pills
+  const pillsEl = document.getElementById('roadmap-pills');
+  if (topTypes.length === 0) {
+    pillsEl.innerHTML = '<span style="color:var(--muted);font-size:0.85rem">아직 분석 데이터가 부족합니다. AI 멘토와 대화해 보세요!</span>';
+  } else {
+    pillsEl.innerHTML = topTypes.slice(0,3).map(t => {
+      const info = RIASEC_INFO[t];
+      return `<span class="riasec-pill" style="color:${info.color};border-color:${info.color}44;background:${info.color}11">${info.label}</span>`;
+    }).join('');
+  }
+
+  // Career cards
+  const cardsEl = document.getElementById('career-cards');
+  if (topTypes.length === 0) {
+    cardsEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🧭</div><div class="empty-state-text">AI 멘토와 대화를 나누면<br>맞춤형 진로 추천이 여기에 나타납니다.</div></div>';
+    document.getElementById('timeline-section').style.display = 'none';
+    return;
+  }
+
+  // Calculate match scores
+  const careers = CAREERS.map(c => {
+    let match = 0;
+    c.types.forEach((t, i) => {
+      const weight = [3, 2, 1][i] || 1;
+      if (topTypes.includes(t)) match += weight * (state.riasec[t] || 0);
+    });
+    return { ...c, match };
+  }).sort((a,b) => b.match - a.match);
+
+  const maxMatch = careers[0].match || 1;
+  cardsEl.innerHTML = careers.slice(0,6).map(c => {
+    const pct = Math.round((c.match / maxMatch) * 100);
+    return `<div class="career-card">
+      <div class="career-card-icon">${c.icon}</div>
+      <div class="career-card-name">${c.name}</div>
+      <div class="career-card-desc">${c.desc}</div>
+      <div class="career-card-match">
+        <span style="font-size:0.72rem;color:var(--muted)">적합도</span>
+        <div class="match-bar-bg"><div class="match-bar-fill" style="width:${pct}%"></div></div>
+        <span class="match-pct">${pct}%</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Timeline based on grade
+  const timelineEl = document.getElementById('roadmap-timeline');
+  const topCareer = careers[0].name;
+  timelineEl.innerHTML = `
+    <div class="timeline-item">
+      <div class="timeline-phase">지금 ~ 1개월</div>
+      <div class="timeline-item-title">자기 탐색 & AI 리터러시 기초</div>
+      <div class="timeline-item-desc">Q::nect AI 멘토와 매일 5분씩 대화하며 자신의 강점과 관심사를 발견하세요. 프롬프트 작성 연습도 함께!</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">1~3개월</div>
+      <div class="timeline-item-title">${topCareer} 관련 탐색</div>
+      <div class="timeline-item-desc">관련 유튜브, 책, 인물 탐색. AI를 활용해 리서치하고 요약 정리해 포트폴리오에 추가하세요.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">3~6개월</div>
+      <div class="timeline-item-title">작은 프로젝트 시작</div>
+      <div class="timeline-item-desc">관심 분야에서 작은 것을 만들어 보세요. 블로그, 작품, 실험 — 무엇이든 시작이 중요합니다.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">6개월+</div>
+      <div class="timeline-item-title">멘토 연결 & 진로 구체화</div>
+      <div class="timeline-item-desc">해당 분야의 대학생 멘토와 연결하여 실제 경험담을 듣고 진학/진로 방향을 구체화하세요.</div>
+    </div>
+  `;
+  document.getElementById('timeline-section').style.display = 'block';
+}
+
+// ═══════════════════════════════════════════
+// PORTFOLIO
+// ═══════════════════════════════════════════
+function autoSavePortfolio(userText, aiText, tags) {
+  const entry = {
+    id: Date.now(),
+    type: '진로 탐색',
+    title: userText.slice(0, 40) + (userText.length > 40 ? '...' : ''),
+    body: aiText.slice(0, 200) + '...',
+    tags: tags.map(t => RIASEC_INFO[t].label),
+    date: new Date().toLocaleDateString('ko-KR'),
+  };
+  state.portfolio.unshift(entry);
+  updateSidebarPortfolio();
+}
+
+function updateSidebarPortfolio() {
+  const el = document.getElementById('sidebar-portfolio');
+  if (state.portfolio.length === 0) return;
+  el.innerHTML = state.portfolio.slice(0,5).map(p => `
+    <li class="portfolio-item">
+      <div>${p.title}</div>
+      <div class="portfolio-item-date">${p.date}</div>
+    </li>
+  `).join('');
+}
+
+function updatePortfolioTab() {
+  const el = document.getElementById('portfolio-grid');
+  if (state.portfolio.length === 0) {
+    el.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📁</div><div class="empty-state-text">아직 저장된 내용이 없습니다.<br>AI 멘토와 대화하며 나를 발견해 보세요!</div></div>';
+    return;
+  }
+  el.innerHTML = state.portfolio.map(p => `
+    <div class="portfolio-entry">
+      <div class="portfolio-entry-type" style="color:var(--accent)">${p.type}</div>
+      <div class="portfolio-entry-title">${p.title}</div>
+      <div class="portfolio-entry-body">${p.body}</div>
+      <div class="portfolio-entry-tags">${p.tags.map(t => `<span class="portfolio-tag">${t}</span>`).join('')}</div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-top:0.75rem;font-family:'Space Mono',monospace">${p.date}</div>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>
